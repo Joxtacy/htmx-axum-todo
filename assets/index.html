@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title> htmx + hyperscript = <3 </title>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <link href="css/style.css" rel="stylesheet">
+      <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
+      <script src="https://unpkg.com/htmx.org@1.9.8"></script>
+      <style>
+        .red {
+          background: red;
+        }
+
+        .error-message {
+          color: red;
+        }
+
+        .error input {
+          box-shadow: 0 0 3px #CC0000;
+        }
+
+        .valid input {
+          box-shadow: 0 0 3px #36cc00;
+        }
+
+        svg {
+          stroke-color: #ff00ff;
+        }
+      </style>
+</head>
+
+<body>
+  <button hx-post="/clicked" hx-swap="outerHTML">
+    Click Me
+  </button>
+  <div _="on click call alert('You clicked me!')">
+    Click Me!
+  </div>
+  <button _="on click toggle .red on me">
+    Click Me
+  </button>
+  <main>
+    <header>
+      <h2> Todo App </h2>
+    </header>
+    <section>
+      <form hx-post="/todo" hx-target=".todos" hx-swap="beforeend" hx-sync="this:abort">
+        <div id="error-modal"></div>
+        <div id="success-modal"></div>
+        <div hx-target="this" hx-swap="outerHTML">
+          <input type="text" name="todo" value="" placeholder="Todo title" hx-post="todo/title" hx-indicator="#ind"
+            hx-disabled-elt="this">
+          <img id="ind" src="/assets/oval_loader.svg" class="htmx-indicator" alt="Loading..." />
+        </div>
+        <input type="submit" value="Add todo">
+      </form>
+      <ul class="todos" hx-trigger="load" hx-get="/todo">
+        <li>First todo</li>
+      </ul>
+      <button hx-get="/todo" hx-target="#derp" hx-swap="innerHTML transition:true">Get todos</button>
+      <ul id="derp"></ul>
+    </section>
+    <footer>
+      A footer idk
+    </footer>
+  </main>
+</body>
+
+</html>
