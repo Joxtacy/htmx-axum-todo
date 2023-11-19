@@ -11,15 +11,6 @@
 </head>
 
 <body>
-  <button hx-post="/clicked" hx-swap="outerHTML">
-    Click Me
-  </button>
-  <div _="on click call alert('You clicked me!')">
-    Click Me!
-  </div>
-  <button _="on click toggle .red on me">
-    Click Me
-  </button>
   <main>
     <header>
       <h2> Todo App </h2>
@@ -36,7 +27,7 @@
         <input type="submit" value="Add todo">
       </form>
       <ul class="todos" hx-trigger="load" hx-get="/todo">
-        <li>First todo</li>
+        <img src="/assets/oval_loader.svg" class="htmx-indicator" alt="Loading..." />
       </ul>
       <button hx-get="/todo" hx-target="#derp" hx-swap="innerHTML transition:true">Get todos</button>
       <ul id="derp"></ul>
