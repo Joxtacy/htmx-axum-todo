@@ -15,7 +15,7 @@ use uuid::Uuid;
 
 #[derive(Debug)]
 struct AppState {
-    todos: Vec<String>,
+    todos: Vec<Todo>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -26,8 +26,7 @@ struct Todo {
 
 #[tokio::main]
 async fn main() {
-    let todos = vec!["First todo".to_string(), "Second todo".to_string()];
-    let shared_state = Arc::new(Mutex::new(AppState { todos }));
+    let shared_state = Arc::new(Mutex::new(AppState { todos: vec![] }));
 
     let app = Router::new()
         .nest_service("/", ServeFile::new("assets/index.html"))
@@ -47,8 +46,19 @@ async fn main() {
 }
 
 #[derive(Debug, Deserialize)]
-struct FormData {
+struct AddTodoData {
     todo: String,
+}
+
+#[derive(Debug, Deserialize)]
+struct DeleteTodoData {
+    id: Uuid,
+}
+
+#[derive(Debug, Deserialize)]
+struct UpdateTodoData {
+    title: String,
+    id: Uuid,
 }
 
 async fn get_todos(State(state): State<Arc<Mutex<AppState>>>) -> Html<String> {
@@ -62,7 +72,7 @@ async fn get_todos(State(state): State<Arc<Mutex<AppState>>>) -> Html<String> {
         .map(|todo| {
             format!(
                 "<li _=\"on click log \'Clicked on: {}\'\">{}</li>",
-                todo, todo
+                todo.title, todo.title
             )
         })
         .collect::<Vec<String>>()
@@ -73,16 +83,20 @@ async fn get_todos(State(state): State<Arc<Mutex<AppState>>>) -> Html<String> {
 
 async fn add_todo(
     State(state): State<Arc<Mutex<AppState>>>,
-    Form(form): Form<FormData>,
+    Form(form): Form<AddTodoData>,
 ) -> Html<String> {
     println!("Adding todo: {}", form.todo);
-
-    let id = Uuid::new_v4();
 
     if form.todo.is_empty() {
         Html("<div id='error-modal' hx-swap-oob='true' class='error-message'>Todo cannot be empty</div>".to_string())
     } else {
-        state.lock().unwrap().todos.push(form.todo.clone());
+        let id = Uuid::new_v4();
+
+        let new_todo = Todo {
+            title: form.todo.clone(),
+            id,
+        };
+        state.lock().unwrap().todos.push(new_todo);
         Html(format!(
             "<li>{}</li>
              <div id='success-modal' hx-swap-oob='true'>Todo added</div>",
@@ -91,25 +105,34 @@ async fn add_todo(
     }
 }
 
-async fn delete_todo(State(state): State<Arc<Mutex<AppState>>>, Form(form): Form<FormData>) {
-    println!("Deleting todo: {}", form.todo);
+async fn delete_todo(State(state): State<Arc<Mutex<AppState>>>, Form(form): Form<DeleteTodoData>) {
+    println!("Deleting todo: {}", form.id);
     state
         .lock()
         .unwrap()
         .todos
-        .retain(|todo| todo != &form.todo);
+        .retain(|todo| todo.id != form.id);
 }
 
-async fn update_todo(State(state): State<Arc<Mutex<AppState>>>, Form(form): Form<FormData>) {
-    println!("Updating todo: {}", form.todo);
+async fn update_todo(State(_state): State<Arc<Mutex<AppState>>>, Form(form): Form<UpdateTodoData>) {
+    println!("Updating todo: {}, {}", form.id, form.title);
+
+    /*
+    let new_title = form.title.clone();
     state
         .lock()
         .unwrap()
         .todos
-        .retain(|todo| todo != &form.todo);
+        .into_iter()
+        .for_each(|mut todo| {
+            if todo.id == form.id {
+                todo.title = new_title;
+            }
+        });
+    */
 }
 
-async fn validate_todo(Form(form): Form<FormData>) -> Html<String> {
+async fn validate_todo(Form(form): Form<AddTodoData>) -> Html<String> {
     println!("Validating todo: {}", form.todo);
     let two_sec = time::Duration::from_secs(2);
     thread::sleep(two_sec);
