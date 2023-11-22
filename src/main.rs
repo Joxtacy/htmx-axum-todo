@@ -13,6 +13,8 @@ use serde::Deserialize;
 use tower_http::services::{ServeDir, ServeFile};
 use uuid::Uuid;
 
+const ARTIFICIAL_DELAY: time::Duration = time::Duration::from_millis(500);
+
 #[derive(Debug)]
 struct AppState {
     todos: Vec<Todo>,
@@ -63,8 +65,7 @@ struct UpdateTodoData {
 
 async fn get_todos(State(state): State<Arc<Mutex<AppState>>>) -> Html<String> {
     println!("Get todos");
-    let two_sec = time::Duration::from_secs(2);
-    thread::sleep(two_sec);
+    thread::sleep(ARTIFICIAL_DELAY);
     let state = state.lock().unwrap();
     let todos = &state.todos;
     let todos = todos
@@ -134,8 +135,7 @@ async fn update_todo(State(_state): State<Arc<Mutex<AppState>>>, Form(form): For
 
 async fn validate_todo(Form(form): Form<AddTodoData>) -> Html<String> {
     println!("Validating todo: {}", form.todo);
-    let two_sec = time::Duration::from_secs(2);
-    thread::sleep(two_sec);
+    thread::sleep(ARTIFICIAL_DELAY);
 
     if form.todo.is_empty() {
         Html(
