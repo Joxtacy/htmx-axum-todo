@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>{%block title}htmx + hyperscript = <3>{% endblock %}</title>
+  {% block head %}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
+  <script src="https://unpkg.com/htmx.org@1.9.8"></script>
+  {% endblock %}
+</head>
+
+<body>
+  <main>
+    <header>
+      {% block header %}{% endblock %}
+    </header>
+    <section>
+      <form hx-post="/todo" hx-target=".todos" hx-swap="beforeend" hx-sync="this:abort">
+        <div id="error-modal"></div>
+        <div id="success-modal"></div>
+        <div hx-target="this" hx-swap="outerHTML">
+          <input type="text" name="todo" value="" placeholder="Todo title" hx-post="todo/title" hx-indicator="#ind"
+            hx-disabled-elt="this">
+          <img id="ind" src="/assets/oval_loader.svg" class="htmx-indicator" alt="Loading..." />
+        </div>
+        <input type="submit" value="Add todo">
+      </form>
+      <ul class="todos" hx-trigger="load" hx-get="/todo">
+        <img src="/assets/oval_loader.svg" class="htmx-indicator" alt="Loading..." />
+        <!-- <li>First todo</li> -->
+      </ul>
+      <button hx-get="/todo" hx-target="#derp" hx-swap="innerHTML transition:true">Get todos</button>
+      <ul id="derp"></ul>
+    </section>
+    <footer>
+      {% block footer %}{% endblock %}
+    </footer>
+  </main>
+</body>
+
+</html>

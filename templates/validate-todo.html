@@ -1,0 +1,6 @@
+<div hx-target="this" hx-swap="outerHTML" class="error">
+  <input type="text" name="todo" hx-post="/todo/title" hx-indicator="#ind" value="{{ value }}" hx-disabled-elt="this"
+    hx-sync="closest form:drop">
+  <img id="ind" src="/assets/oval_loader.svg" class="htmx-indicator" />
+  <div class='error-message'>{{ error_message }}</div>
+</div>

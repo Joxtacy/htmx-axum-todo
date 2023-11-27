@@ -1,0 +1,15 @@
+{% let checked -%}
+{% if done == true -%}
+{% let checked = "checked" -%}
+{% else -%}
+{% let checked = "" -%}
+{% endif -%}
+<li hx-target="closest li" hx-swap="outerHTML swap:1s">
+  <input type="checkbox" hx-put="/todo/{{ id }}/done" hx-swap="outerHTML swap:1s" {{ checked }}>
+  <div>
+    {{ title }}
+  </div>
+  <button type="button" hx-get="/todo/{{ id }}/edit">Edit</button>
+  <button type="button" hx-delete="/todo/{{ id }}"
+    hx-confirm="Are you sure you want to delete: {{ title }}?">Delete</button>
+</li>
