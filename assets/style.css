@@ -13,3 +13,20 @@
 .valid input {
   box-shadow: 0 0 3px #36cc00;
 }
+
+li.htmx-swapping {
+  opacity: 0;
+  transition: opacity 1s ease-out;
+}
+
+ul {
+  padding-inline-start: 0;
+}
+
+ul li {
+  list-style-type: none;
+}
+
+li {
+  display: flex;
+}
