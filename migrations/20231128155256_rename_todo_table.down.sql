@@ -1,0 +1,1 @@
+ALTER TABLE IF EXISTS todos RENAME TO todo;
