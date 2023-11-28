@@ -120,7 +120,7 @@ async fn get_todos(State(state): State<Arc<AppState>>) -> Html<String> {
     println!("Get todos");
     // thread::sleep(ARTIFICIAL_DELAY);
 
-    let todos = sqlx::query_as::<_, DbRow>("SELECT * FROM todo")
+    let todos = sqlx::query_as!(DbRow, "SELECT * FROM todo")
         .fetch_all(&state.pool)
         .await
         .unwrap();
@@ -143,8 +143,7 @@ async fn get_todos(State(state): State<Arc<AppState>>) -> Html<String> {
 }
 
 async fn get_todo(State(state): State<Arc<AppState>>, Path(id): Path<Uuid>) -> Html<String> {
-    let todo = sqlx::query_as::<_, DbRow>("SELECT * FROM todo WHERE id = $1")
-        .bind(id)
+    let todo = sqlx::query_as!(DbRow, "SELECT * FROM todo WHERE id = $1", id)
         .fetch_one(&state.pool)
         .await
         .unwrap();
@@ -162,8 +161,7 @@ async fn get_todo(State(state): State<Arc<AppState>>, Path(id): Path<Uuid>) -> H
 
 async fn get_edit_todo(State(state): State<Arc<AppState>>, Path(id): Path<Uuid>) -> Html<String> {
     println!("Get edit todo: {}", id);
-    let todo = sqlx::query_as::<_, DbRow>("SELECT * FROM todo WHERE id = $1")
-        .bind(id)
+    let todo = sqlx::query_as!(DbRow, "SELECT * FROM todo WHERE id = $1", id)
         .fetch_one(&state.pool)
         .await
         .unwrap();
@@ -194,8 +192,7 @@ async fn add_todo(
     } else {
         let id = Uuid::new_v4();
 
-        sqlx::query("INSERT INTO todo (title) VALUES ($1)")
-            .bind(&form.todo)
+        sqlx::query!("INSERT INTO todo (title) VALUES ($1)", &form.todo)
             .execute(&state.pool)
             .await
             .unwrap();
@@ -219,8 +216,7 @@ async fn add_todo(
 async fn delete_todo(State(state): State<Arc<AppState>>, Path(id): Path<Uuid>) -> Html<String> {
     println!("Deleting todo: {}", id);
 
-    sqlx::query("DELETE FROM todo WHERE id = $1")
-        .bind(id)
+    sqlx::query!("DELETE FROM todo WHERE id = $1", id)
         .execute(&state.pool)
         .await
         .unwrap();
@@ -234,12 +230,14 @@ async fn update_todo(
 ) -> Html<String> {
     println!("Updating todo: {}", form.title);
 
-    sqlx::query("UPDATE todo SET title = $1 WHERE id = $2")
-        .bind(&form.title)
-        .bind(&form.id)
-        .execute(&state.pool)
-        .await
-        .unwrap();
+    sqlx::query!(
+        "UPDATE todo SET title = $1 WHERE id = $2",
+        &form.title,
+        &form.id
+    )
+    .execute(&state.pool)
+    .await
+    .unwrap();
 
     let new_todo = TodoItem {
         title: &form.title,
@@ -252,15 +250,13 @@ async fn update_todo(
 
 async fn done_todo(State(state): State<Arc<AppState>>, Path(id): Path<Uuid>) -> Html<String> {
     println!("Done todo id: {}", id);
-    let _rows_affected = sqlx::query("UPDATE todo SET done = NOT done WHERE id = $1")
-        .bind(id)
+    let _rows_affected = sqlx::query!("UPDATE todo SET done = NOT done WHERE id = $1", id)
         .execute(&state.pool)
         .await
         .unwrap()
         .rows_affected();
 
-    let todo = sqlx::query_as::<_, DbRow>("SELECT * FROM todo WHERE id = $1")
-        .bind(id)
+    let todo = sqlx::query_as!(DbRow, "SELECT * FROM todo WHERE id = $1", id)
         .fetch_one(&state.pool)
         .await
         .unwrap();
