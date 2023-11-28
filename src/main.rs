@@ -8,7 +8,7 @@ use axum::{
     Form, Router,
 };
 use serde::Deserialize;
-use sqlx::{postgres::PgPoolOptions, Pool, Postgres};
+use sqlx::postgres::PgPoolOptions;
 use tower_http::services::{ServeDir, ServeFile};
 use uuid::Uuid;
 
