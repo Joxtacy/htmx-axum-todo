@@ -35,6 +35,7 @@ struct DbRow {
     title: String,
     created_at: chrono::DateTime<chrono::Utc>,
     done: bool,
+    done_at: Option<chrono::DateTime<chrono::Utc>>,
 }
 
 #[tokio::main]
@@ -217,11 +218,14 @@ async fn update_todo(
 
 async fn done_todo(State(state): State<Arc<AppState>>, Path(id): Path<Uuid>) -> Html<String> {
     println!("Done todo id: {}", id);
-    let _rows_affected = sqlx::query!("UPDATE todos SET done = NOT done WHERE id = $1", id)
-        .execute(&state.pool)
-        .await
-        .unwrap()
-        .rows_affected();
+    let _rows_affected = sqlx::query!(
+        "UPDATE todos SET done = NOT done, done_at = CASE WHEN done THEN NULL ELSE now() END WHERE id = $1",
+        id
+    )
+    .execute(&state.pool)
+    .await
+    .unwrap()
+    .rows_affected();
 
     let todo = sqlx::query_as!(DbRow, "SELECT * FROM todos WHERE id = $1", id)
         .fetch_one(&state.pool)
