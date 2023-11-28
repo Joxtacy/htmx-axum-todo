@@ -12,6 +12,10 @@ use sqlx::{postgres::PgPoolOptions, Pool, Postgres};
 use tower_http::services::{ServeDir, ServeFile};
 use uuid::Uuid;
 
+use crate::templates::*;
+
+mod templates;
+
 const ARTIFICIAL_DELAY: time::Duration = time::Duration::from_millis(500);
 
 #[derive(Debug, Clone)]
@@ -23,47 +27,6 @@ struct AppState {
 struct Todo {
     title: String,
     id: Uuid,
-}
-
-#[derive(Template)]
-#[template(path = "list-item.html")]
-struct ListItem<'a> {
-    title: &'a str,
-}
-
-#[derive(Template)]
-#[template(path = "error-modal.html")]
-struct ErrorModal<'a> {
-    error_message: &'a str,
-}
-
-#[derive(Template)]
-#[template(path = "success-modal.html")]
-struct SuccessModal<'a> {
-    message: &'a str,
-}
-
-#[derive(Template)]
-#[template(path = "validate-todo.html")]
-struct ValidateTodoModal<'a> {
-    error_message: &'a str,
-    value: &'a str,
-}
-
-#[derive(Template)]
-#[template(path = "todo.html")]
-struct TodoItem<'a> {
-    title: &'a str,
-    id: Uuid,
-    done: bool,
-}
-
-#[derive(Template)]
-#[template(path = "edit-todo.html")]
-struct EditTodoItem<'a> {
-    title: &'a str,
-    id: Uuid,
-    done: bool,
 }
 
 #[derive(Debug, sqlx::FromRow)]
