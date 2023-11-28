@@ -1,4 +1,4 @@
-use std::{sync::Arc, thread, time};
+use std::{env, sync::Arc, thread, time};
 
 use askama::Template;
 use axum::{
@@ -76,9 +76,13 @@ struct DbRow {
 
 #[tokio::main]
 async fn main() {
+    dotenvy::dotenv().expect("Failed to load `.env` file");
+
+    let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set in `.env`");
+
     let pool = PgPoolOptions::new()
         .max_connections(5)
-        .connect("postgres://postgres:mysecretpassword@localhost/htmx_todo")
+        .connect(database_url.as_str())
         .await
         .unwrap();
 
