@@ -87,7 +87,7 @@ async fn get_todos(State(state): State<Arc<AppState>>) -> Html<String> {
     println!("Get todos");
     // thread::sleep(ARTIFICIAL_DELAY);
 
-    let todos = sqlx::query_as!(DbRow, "SELECT * FROM todos")
+    let todos = sqlx::query_as!(DbRow, "SELECT * FROM todos ORDER BY created_at ASC")
         .fetch_all(&state.pool)
         .await
         .unwrap();
