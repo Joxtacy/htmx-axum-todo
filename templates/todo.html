@@ -4,8 +4,8 @@
 {% else -%}
 {% let checked = "" -%}
 {% endif -%}
-<li hx-target="closest li" hx-swap="outerHTML swap:1s">
-  <input type="checkbox" hx-put="/todo/{{ id }}/done" hx-swap="outerHTML swap:1s" {{ checked }}>
+<li hx-target="closest li" hx-swap="outerHTML">
+  <input type="checkbox" hx-put="/todo/{{ id }}/done" {{ checked }}>
   <div>
     {{ title }}
   </div>
