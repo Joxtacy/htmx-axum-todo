@@ -50,6 +50,11 @@ async fn main() {
         .await
         .unwrap();
 
+    sqlx::migrate!()
+        .run(&pool)
+        .await
+        .expect("Failed to run migrations");
+
     let shared_state = Arc::new(AppState { pool: pool.clone() });
 
     let app = Router::new()
